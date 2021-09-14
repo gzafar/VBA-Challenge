@@ -1,0 +1,128 @@
+Sub Stock_Market():
+
+    'Loop through all sheets
+    For Each ws In Worksheets
+
+    'Set an initial variable for holding the ticker
+    Dim Ticker As String
+
+    'Set a variable for holding total per ticker
+    Dim Ticker_Total As Double
+    Ticker_Total = 0
+
+    'Set variable for Year Open
+    Dim Year_Open As Double
+    Year_Open = 0
+
+    'Set variable for Year Close
+    Dim Year_Close As Double
+    Year_Close = 0
+    
+    'Set variable for Yearly_Change
+    Dim Yearly_Change As Double
+    Yearly_Change = 0
+    
+    'Set variable for Percent_Change
+    Dim Percent_Change As Double
+    Percent_Change = 0
+    
+    'Keep track of the location for each ticker in summary table
+    Dim Summary_Table_Row As Integer
+    Summary_Table_Row = 2
+    
+    Year_Open = ws.Cells(2, 3).Value
+    
+        'Loop through rows in the column
+        LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        For i = 2 To LastRow
+
+            'Search for when value (Ticker) of a cell is different than previous cell
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+            
+                'Find values for Year Open and Year Close
+                Year_Close = ws.Cells(i, 6).Value
+            
+                'Message Box of current cell value & next cell value
+                'MsgBox (Cells(i, 1).Value & " and then " & Cells(i + 1, 1).Value)
+                
+                'Set Ticker
+                Ticker = ws.Cells(i, 1).Value
+                
+                'Calculate yearly change
+                Yearly_Change = Year_Close - Year_Open
+                
+                'Add words Yearly Change to the Summary Table Header
+                ws.Cells(1, 10).Value = "Yearly Change"
+           
+                'Print the Yearly Change Difference in the Summary Table
+                ws.Range("J" & Summary_Table_Row).Value = Yearly_Change
+                 
+                    'Make sure denominator is not equal to 0
+                    If Year_Open <> 0 Then
+
+                      'Calculate percent change
+                      Percent_Change = (Yearly_Change / Year_Open) * 100
+                      
+                    Else
+                        
+                        'If denominator is equal to 0
+                        Percent_Change = 0
+                      
+                    End If
+                    
+                'Add words Percent Change to the Summary Table Header
+                ws.Cells(1, 11).Value = "Percent Change"
+                    
+                'Print the Percent Change Difference in the Summary Table
+                ws.Range("K" & Summary_Table_Row).Value = Percent_Change
+                
+                'Add to Ticker Total
+                Ticker_Total = Ticker_Total + ws.Cells(i, 7).Value
+                
+                'Print the Ticker in the Summary Table
+                ws.Range("I" & Summary_Table_Row).Value = Ticker
+                
+                'Add word Ticker to the Summary Table Header
+                ws.Cells(1, 9).Value = "Ticker"
+                
+                'Print the Ticker Total in the Summary Table
+                ws.Range("L" & Summary_Table_Row).Value = Ticker_Total
+                    
+                    'Check if yearly change was positive
+                    If ws.Cells(Summary_Table_Row, 10).Value >= 0 Then
+
+                    'Color the positive change
+                    ws.Cells(Summary_Table_Row, 10).Interior.ColorIndex = 4
+
+                    'Check if change was negative
+                    ElseIf ws.Cells(Summary_Table_Row, 10).Value < 0 Then
+
+                    'Color the negative change
+                    ws.Cells(Summary_Table_Row, 10).Interior.ColorIndex = 3
+
+                    End If
+                    
+                'Add one to the summary table row
+                Summary_Table_Row = Summary_Table_Row + 1
+                
+                'Reset the Ticker Total
+                Ticker_Total = 0
+                
+                'If the cell immediately following a row is the same ticker
+                Else
+                
+                'Add to ticker total
+                Ticker_Total = Ticker_Total + ws.Cells(i, 7).Value
+                
+                'Add words Total Stock Volume to Summary Table Header
+                ws.Cells(1, 12).Value = "Total Stock Volume"
+            
+            End If
+    
+    Next i
+
+    Next ws
+
+End Sub
+
+'Thank you to TAs Chris & Erin for helping with my first ever coding endeavor!
